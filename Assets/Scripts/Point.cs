@@ -6,13 +6,49 @@ using System;
 public class Point : MonoBehaviour
 {
     /// <summary>
-    /// vị trí của point cần lấy ra trong list các points
+    /// check xem có phải point đầu tiên sinh ra ko
     /// </summary>
-    public int index;
+    public bool isFirstPoint;
+    /// <summary>
+    /// = true => point đang bị khóa; = false => đã mở khóa
+    /// </summary>
+    public bool block;
+    /// <summary>
+    /// giá tiền để mua point tiếp theo
+    /// </summary>
+    public float cost;
+
     public PointInfo pInfo;
     private void Start()
     {
         pInfo.thisPoint = this.gameObject;
+        //Invoke("AutoGetMoney", 2f);
+        InvokeRepeating("AutoGetMoney", 2f, pInfo.tgPro);
+    }
+
+    private void OnEnable()
+    {
+        //Debug.Log("<b>point enable.</b>");
+        //if (this.isFirstPoint == false)
+        //{
+        //    //InvokeRepeating("AutoGetMoney", 4f, pInfo.tgPro);
+        //}
+    }
+
+    private void Update()
+    {
+        //if (this.block == false)
+        //{
+        //    InvokeRepeating("AutoGetMoney", 0f, pInfo.tgPro);
+        //}
+    }
+
+    /// <summary>
+    /// tự động kiếm tiền ko cần click
+    /// </summary>
+    private void AutoGetMoney()
+    {
+        GameManager.instance.money += pInfo.proPro;
     }
 }
 
