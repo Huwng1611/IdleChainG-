@@ -6,10 +6,6 @@ using System;
 public class Point : MonoBehaviour
 {
     /// <summary>
-    /// check xem có phải point đầu tiên sinh ra ko
-    /// </summary>
-    public bool isFirstPoint;
-    /// <summary>
     /// = true => point đang bị khóa; = false => đã mở khóa
     /// </summary>
     public bool block;
@@ -22,25 +18,12 @@ public class Point : MonoBehaviour
     private void Start()
     {
         pInfo.thisPoint = this.gameObject;
-        //Invoke("AutoGetMoney", 2f);
         InvokeRepeating("AutoGetMoney", 2f, pInfo.tgPro);
-    }
-
-    private void OnEnable()
-    {
-        //Debug.Log("<b>point enable.</b>");
-        //if (this.isFirstPoint == false)
-        //{
-        //    //InvokeRepeating("AutoGetMoney", 4f, pInfo.tgPro);
-        //}
     }
 
     private void Update()
     {
-        //if (this.block == false)
-        //{
-        //    InvokeRepeating("AutoGetMoney", 0f, pInfo.tgPro);
-        //}
+
     }
 
     /// <summary>

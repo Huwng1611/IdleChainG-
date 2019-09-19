@@ -17,9 +17,7 @@ public class GenerateMap : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        GeneratePointOnMap();
-        //GameManager.instance.AddEventPointWasActived()
-        //GameManager.instance.AddEventPointWasActived(GameManager.instance.activePoints);
+        GeneratePointOnMap();     
     }
 
     private void Update()
