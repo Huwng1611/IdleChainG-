@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,12 +11,15 @@ public class GenerateMap : MonoBehaviour
 
     //public List<GameObject> GameManager.instance.points;
     public int freeFirstPoint;
-    private const int pointAmount = 49;
+    public int pointAmount = 16;
+    public int columnAmount;
+    public int rowAmount;
 
     // Start is called before the first frame update
     private void Start()
     {
-        GeneratePointOnMap();     
+        parentMap.GetComponent<GridLayoutGroup>().constraintCount = columnAmount;
+        GeneratePointOnMap();
     }
 
     private void Update()
@@ -31,7 +33,6 @@ public class GenerateMap : MonoBehaviour
         GameManager.instance.points[freeFirstPoint].GetComponent<Image>().color = Color.white;
         GameManager.instance.points[freeFirstPoint].GetComponent<Point>().enabled = true;
         GameManager.instance.points[freeFirstPoint].GetComponent<Point>().block = false;
-        GameManager.instance.points[freeFirstPoint].GetComponent<Point>().cost = 0;
         GameManager.instance.activePoints.Add(GameManager.instance.points[freeFirstPoint]);
     }
 
@@ -51,6 +52,9 @@ public class GenerateMap : MonoBehaviour
             pointCount++;
         }
         GetAFreePoint();
+        AddAllAroundPoints();
+        //AddAroundPointOfCurrentPoint();
+
         GameManager.instance.AddEventForPoint(GameManager.instance.points);
         GameManager.instance.DefaultValueFirstPoint(GameManager.instance.points[freeFirstPoint]);
         StartCoroutine(DrawLineMap());
@@ -87,11 +91,11 @@ public class GenerateMap : MonoBehaviour
                         temp = ln.transform.position;
                         temp.x += 100;
                         ln.transform.position = temp;
-                        if (Enumerable.Range(GameManager.instance.points.Count - 7, GameManager.instance.points.Count - 1).Contains(i))
+                        if (Enumerable.Range(GameManager.instance.points.Count - columnAmount, GameManager.instance.points.Count - 1).Contains(i))
                         {
                             Destroy(GameManager.instance.points[i].transform.GetChild(0).gameObject);
                         }
-                        if ((i + 1) % 7 == 0)
+                        if ((i + 1) % columnAmount == 0)
                         {
                             Destroy(GameManager.instance.points[i].transform.GetChild(1).gameObject);
                         }
@@ -100,5 +104,117 @@ public class GenerateMap : MonoBehaviour
             }
         }
         yield return 0;
+    }
+
+    public void AddAllAroundPoints()
+    {
+        for (int i = 0; i < GameManager.instance.points.Count; i++)
+        {
+            if (GameManager.instance.points[i].GetComponent<Point>().block == false)
+            {
+                //point góc trái hàng đầu
+                if (i == 0)
+                {
+                    if (!GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i + 1])
+                        && !GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i + columnAmount]))
+                    {
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i + 1]);
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i + columnAmount]);
+                    }
+                }
+                //point góc phải hàng đầu
+                else if (i == columnAmount - 1)
+                {
+                    if (!GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i - 1])
+                        && !GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i + columnAmount]))
+                    {
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i - 1]);
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i + columnAmount]);
+                    }
+                }
+                //point góc trái hàng cuối
+                else if (i == GameManager.instance.points.Count - columnAmount)
+                {
+                    if (!GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i + 1])
+                        && !GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i - columnAmount]))
+                    {
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i + 1]);
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i - columnAmount]);
+                    }
+                }
+                //ponint góc phải hàng cuối
+                else if (i == GameManager.instance.points.Count - 1)
+                {
+                    if (!GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i - 1])
+                        && !GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i - columnAmount]))
+                    {
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i - 1]);
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i - columnAmount]);
+                    }
+                }
+                //các points hàng đầu tiên (trừ 2 point đầu mút)
+                else if (Enumerable.Range(1, columnAmount - 1 - 1).Contains(i))
+                {
+                    if (!GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i - 1])
+                        && !GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i + 1])
+                        && !GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i + columnAmount]))
+                    {
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i - 1]);
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i + 1]);
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i + columnAmount]);
+                    }
+                }
+                //các point hàng cuối cùng (trừ 2 point đầu mút)
+                else if (Enumerable.Range(GameManager.instance.points.Count - columnAmount + 1, GameManager.instance.points.Count - 1 - 1).Contains(i))
+                {
+                    if (!GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i - 1])
+                        && !GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i + 1])
+                        && !GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i - columnAmount]))
+                    {
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i - 1]);
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i + 1]);
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i - columnAmount]);
+                    }
+                }
+                //các point cột đầu (trừ 2 point đầu mút)
+                else if (i != 0 && i % columnAmount == 0)
+                {
+                    if (!GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i + 1])
+                        && !GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i - columnAmount])
+                        && !GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i + columnAmount]))
+                    {
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i + 1]);
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i - columnAmount]);
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i + columnAmount]);
+                    }
+                }
+                //các point cột cuối (trừ 2 point đàu mút)
+                else if (i != (columnAmount - 1) && i != GameManager.instance.points.Count - 1 && i % columnAmount == (columnAmount - 1))
+                {
+                    if (!GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i - 1])
+                       && !GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i - columnAmount])
+                       && !GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i + columnAmount]))
+                    {
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i - 1]);
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i - columnAmount]);
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i + columnAmount]);
+                    }
+                }
+                //các point nằm giữa
+                else
+                {
+                    if (!GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i - 1])
+                       && !GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i + 1])
+                       && !GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i - columnAmount])
+                       && !GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Contains(GameManager.instance.points[i + columnAmount]))
+                    {
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i - 1]);
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i + 1]);
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i - columnAmount]);
+                        GameManager.instance.points[i].GetComponent<Point>().aroundPoints.Add(GameManager.instance.points[i + columnAmount]);
+                    }
+                }
+            }
+        }
     }
 }

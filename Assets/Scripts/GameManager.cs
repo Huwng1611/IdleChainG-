@@ -16,6 +16,11 @@ public class GameManager : MonoBehaviour
     public List<GameObject> points;
     public List<GameObject> activePoints;
 
+    public GenerateMap genMap;
+    public NextLevelInfor nextLv;
+    public ParticleSystem effectCombo;
+
+    [Header("Upgrade")]
     /// <summary>
     /// cooldown giảm 1.1 lần sau mỗi upgrade
     /// </summary>
@@ -28,6 +33,12 @@ public class GameManager : MonoBehaviour
     /// số tiền thu đc sau click tăng 1.05 lần sau upgrade
     /// </summary>
     public float moneyEarnedUpgrade = 1.05f;
+    /// <summary>
+    /// tCombo khi mở tất cả các point
+    /// </summary>
+    public float tCombo = 2f;
+
+    [Header("Number of actived point")]
     /// <summary>
     /// số các point đã mở, dùng để tính giá mở point tiếp theo
     /// </summary>
@@ -117,15 +128,18 @@ public class GameManager : MonoBehaviour
     private void OnClickPoint(GameObject point)
     {
         groupButtons.SetActive(true);
+        nextLv.ShowInfoNextLevel(point);
         StartCoroutine(CoolDownToNextClick(point));
         ClickGetMoney(point);
-        StartCoroutine(PointSuffuse());
-        //StartCoroutine(PointSuffuse1111(points));
+        StartCoroutine(CheckAllAroundPoints(point));
+        //StartCoroutine(CheckAllAroundPoint1111(point));
+        //StartCoroutine(PointSuffuse());
 
         if (activePoints.Count > 1)
         {
             ComboMoney(point, activePoints.IndexOf(point));
         }
+        ComboAllPoint(point);
         Debug.Log("<color=orange>Da bam dc roi</color>");
     }
 
@@ -163,7 +177,6 @@ public class GameManager : MonoBehaviour
     public void AfterUpgradeClick()
     {
         GameObject point;
-        //int.TryParse(EventSystem.current.currentSelectedGameObject.name, out indexTemp);
         point = objTemp;
         point.GetComponent<Point>();
         PointInfo pInf = point.GetComponent<Point>().pInfo;
@@ -218,10 +231,10 @@ public class GameManager : MonoBehaviour
                         }
                         );
                     }
-                    if (points[i + 7].GetComponent<Point>().block == true)
+                    if (points[i + genMap.columnAmount].GetComponent<Point>().block == true)
                     {
-                        GameObject temp = points[i + 7];
-                        points[i + 7].GetComponent<Button>().onClick.AddListener(() =>
+                        GameObject temp = points[i + genMap.columnAmount];
+                        points[i + genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
                             AddPointToListActived(temp);
@@ -244,10 +257,10 @@ public class GameManager : MonoBehaviour
                         }
                         );
                     }
-                    if (points[i - 7].GetComponent<Point>().block == true)
+                    if (points[i - genMap.columnAmount].GetComponent<Point>().block == true)
                     {
-                        GameObject temp = points[i - 7];
-                        points[i - 7].GetComponent<Button>().onClick.AddListener(() =>
+                        GameObject temp = points[i - genMap.columnAmount];
+                        points[i - genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
                             AddPointToListActived(temp);
@@ -257,12 +270,12 @@ public class GameManager : MonoBehaviour
                     }
                 }
                 //hàng đầu tiên
-                else if (Enumerable.Range(0, 7).Contains(i))
+                else if (Enumerable.Range(0, genMap.columnAmount).Contains(i))
                 {
-                    if (points[i + 7].GetComponent<Point>().block == true)
+                    if (points[i + genMap.columnAmount].GetComponent<Point>().block == true)
                     {
-                        GameObject temp = points[i + 7];
-                        points[i + 7].GetComponent<Button>().onClick.AddListener(() =>
+                        GameObject temp = points[i + genMap.columnAmount];
+                        points[i + genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
                             AddPointToListActived(temp);
@@ -294,7 +307,7 @@ public class GameManager : MonoBehaviour
                     }
                 }
                 //hàng cuối cùng
-                else if (Enumerable.Range(42, 48).Contains(i))
+                else if (Enumerable.Range(points.Count - genMap.columnAmount, points.Count - 1).Contains(i))
                 {
                     if (points[i - 1].GetComponent<Point>().block == true)
                     {
@@ -307,10 +320,10 @@ public class GameManager : MonoBehaviour
                         }
                         );
                     }
-                    if (points[i - 7].GetComponent<Point>().block == true)
+                    if (points[i - genMap.columnAmount].GetComponent<Point>().block == true)
                     {
-                        GameObject temp = points[i - 7];
-                        points[i - 7].GetComponent<Button>().onClick.AddListener(() =>
+                        GameObject temp = points[i - genMap.columnAmount];
+                        points[i - genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
                             AddPointToListActived(temp);
@@ -355,10 +368,10 @@ public class GameManager : MonoBehaviour
                         }
                         );
                     }
-                    if (points[i - 7].GetComponent<Point>().block == true)
+                    if (points[i - genMap.columnAmount].GetComponent<Point>().block == true)
                     {
-                        GameObject temp = points[i - 7];
-                        points[i - 7].GetComponent<Button>().onClick.AddListener(() =>
+                        GameObject temp = points[i - genMap.columnAmount];
+                        points[i - genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
                             AddPointToListActived(temp);
@@ -366,10 +379,10 @@ public class GameManager : MonoBehaviour
                         }
                         );
                     }
-                    if (points[i + 7].GetComponent<Point>().block == true)
+                    if (points[i + genMap.columnAmount].GetComponent<Point>().block == true)
                     {
-                        GameObject temp = points[i + 7];
-                        points[i + 7].GetComponent<Button>().onClick.AddListener(() =>
+                        GameObject temp = points[i + genMap.columnAmount];
+                        points[i + genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
                             AddPointToListActived(temp);
@@ -399,7 +412,8 @@ public class GameManager : MonoBehaviour
                 point.GetComponent<Point>().enabled = true;
                 point.GetComponent<Point>().block = false;
                 point.GetComponent<Image>().color = Color.white;
-
+                genMap.AddAllAroundPoints();
+                //genMap.AddAroundPointOfCurrentPoint();
                 //Gán sự kiện click kiếm tiền vào point mới
                 point.GetComponent<Button>().onClick.AddListener(() =>
                 {
@@ -448,9 +462,9 @@ public class GameManager : MonoBehaviour
     /// <returns></returns>
     private double CalculateCost()
     {
-        numberActive = (double)activePoints.Count;
-        //var cost = 50 * Math.Pow(50, numberActive);
-        var cost = 1 * Math.Pow(1, numberActive); //giá tạm để test
+        numberActive = (double)(activePoints.Count + 1);
+        var cost = 50 * Math.Pow(50, numberActive);
+        //var cost = 1 * Math.Pow(1, numberActive); //giá tạm để test
         return cost;
     }
 
@@ -461,9 +475,9 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < points.Count - 1; i++)
         {
-            if (!Enumerable.Range(42, 47).Contains(i)) //loại point 42 - 47
+            if (!Enumerable.Range(points.Count - genMap.columnAmount, points.Count - 2).Contains(i))
             {
-                if (i % 7 != 6)
+                if (i % genMap.columnAmount != (genMap.columnAmount - 1))
                 {
                     if (points[i].GetComponent<RectTransform>().rect.x == points[i + 1].GetComponent<RectTransform>().rect.x)
                     {
@@ -474,7 +488,7 @@ public class GameManager : MonoBehaviour
                     }
                 }
             }
-            else if (Enumerable.Range(42, 47).Contains(i)) //tính point 42 - 47
+            else if (Enumerable.Range(points.Count - genMap.columnAmount, points.Count - 2).Contains(i))
             {
                 if (points[i].GetComponent<Point>().block == false && points[i + 1].GetComponent<Point>().block == false)
                 {
@@ -489,13 +503,135 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void LinkedVertical()
     {
-        for (int i = 0; i < points.Count - 7; i++) // ko tính hàng cuối cùng
+        for (int i = 0; i < points.Count - genMap.columnAmount; i++) // ko tính hàng cuối cùng
         {
-            if (points[i].GetComponent<Point>().block == false && points[i + 7].GetComponent<Point>().block == false)
+            if (points[i].GetComponent<Point>().block == false && points[i + genMap.columnAmount].GetComponent<Point>().block == false)
             {
                 points[i].transform.GetChild(0).gameObject.GetComponent<Image>().color = Color.cyan;
             }
         }
+    }
+
+    //private IEnumerator CheckAllAroundPoint1111(GameObject point)
+    //{
+    //    //int pNumber = point.GetComponent<Point>().aroundPoints.Count;
+    //    //List<GameObject> tempList = point.GetComponent<Point>().aroundPoints;
+    //    for (int i = 0; i < points.Count; i++)
+    //    {
+    //        if (points[i].GetComponent<Point>().block == false)
+    //        {
+    //            //point đầu góc trái
+    //            if (point == points[0])
+    //            {
+    //                StartCoroutine(point.transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(point, points[1]));
+    //                StartCoroutine(point.transform.GetChild(1).gameObject.GetComponent<Line>().FillFullLine(point, points[genMap.columnAmount]));
+    //            }
+    //            //point đầu góc phải
+    //            else if (point == points[genMap.columnAmount - 1])
+    //            {
+    //                StartCoroutine(point.transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(point, points[genMap.columnAmount - 1 + genMap.columnAmount]));
+    //                StartCoroutine(points[genMap.columnAmount - 1 - 1].transform.GetChild(1).gameObject.GetComponent<Line>().FillFullLine(point, points[genMap.columnAmount - 1 - 1]));
+    //            }
+    //            //point cuối góc trái
+    //            else if (point == points[points.Count - genMap.columnAmount])
+    //            {
+    //                StartCoroutine(point.transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(point, points[points.Count - genMap.columnAmount + 1]));
+    //                StartCoroutine(points[points.Count - genMap.columnAmount - genMap.columnAmount].transform.GetChild(1).gameObject.GetComponent<Line>().FillFullLine(point, points[points.Count - genMap.columnAmount - genMap.columnAmount]));
+    //            }
+    //            //point cuối góc phải
+    //            else if (point == points[points.Count - 1])
+    //            {
+    //                StartCoroutine(points[points.Count - 1 - 1].transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(point, points[points.Count - 1 - 1]));
+    //                StartCoroutine(points[points.Count - 1 - genMap.columnAmount].transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(point, points[points.Count - 1 - genMap.columnAmount]));
+    //            }
+    //            else
+    //            {
+    //                //các point giữa
+    //                if (point.transform.childCount == genMap.columnAmount)
+    //                {
+    //                    StartCoroutine(point.transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(point, points[i - 1]));
+    //                    StartCoroutine(point.transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(point, points[i + 1]));
+    //                    StartCoroutine(point.transform.GetChild(1).gameObject.GetComponent<Line>().FillFullLine(point, points[i - genMap.columnAmount]));
+    //                    StartCoroutine(point.transform.GetChild(1).gameObject.GetComponent<Line>().FillFullLine(point, points[i + genMap.columnAmount]));
+    //                }
+
+    //                //point cột trái
+    //                if (i != 0 && i % genMap.columnAmount == 0)
+    //                {
+    //                    StartCoroutine(point.transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(point, points[i + 1]));
+    //                    StartCoroutine(points[i - genMap.columnAmount].transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(point, points[i - genMap.columnAmount]));
+    //                    StartCoroutine(point.transform.GetChild(1).gameObject.GetComponent<Line>().FillFullLine(point, points[i + genMap.columnAmount]));
+    //                }
+    //                //point cột phải
+    //                else if (i != genMap.columnAmount - 1 && i != points.Count - 1 && i % genMap.columnAmount == genMap.columnAmount - 1)
+    //                {
+    //                    StartCoroutine(points[i - 1].transform.GetChild(1).gameObject.GetComponent<Line>().FillFullLine(point, points[i - 1]));
+    //                    StartCoroutine(points[i - genMap.columnAmount].transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(point, points[i - genMap.columnAmount]));
+    //                    StartCoroutine(point.transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(point, points[i + genMap.columnAmount]));
+    //                }
+    //                //point hàng đầu
+    //                else if (Enumerable.Range(1, genMap.columnAmount - 1 - 1).Contains(i))
+    //                {
+    //                    StartCoroutine(points[i - 1].transform.GetChild(1).gameObject.GetComponent<Line>().FillFullLine(point, points[i - 1]));
+    //                    StartCoroutine(point.transform.GetChild(1).gameObject.GetComponent<Line>().FillFullLine(point, points[i + 1]));
+    //                    StartCoroutine(point.transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(point, points[i + genMap.columnAmount]));
+    //                }
+    //                //point hàng cuối
+    //                else if (Enumerable.Range(GameManager.instance.points.Count - genMap.columnAmount + 1, GameManager.instance.points.Count - 1 - 1).Contains(i))
+    //                {
+    //                    StartCoroutine(points[i - 1].transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(point, points[i - 1]));
+    //                    StartCoroutine(point.transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(point, points[i + 1]));
+    //                    StartCoroutine(points[i - genMap.columnAmount].transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(point, points[i - genMap.columnAmount]));
+    //                }
+    //            }
+    //        }
+    //    }
+    //    yield return 0;
+    //}
+
+    /// <summary>
+    /// duyệt các point xung quanh point đang xét
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator CheckAllAroundPoints(GameObject point)
+    {
+        int pNumber = point.GetComponent<Point>().aroundPoints.Count;
+        List<GameObject> tempList = point.GetComponent<Point>().aroundPoints;
+        for (int i = 0; i < pNumber; i++)
+        {
+            //yield return new WaitForEndOfFrame();
+            if (/*point.GetComponent<Point>().block == false && */tempList[i].GetComponent<Point>().block == false
+               /* && point.GetComponent<Point>().isMarked == false*/ /*&& tempList[i].GetComponent<Point>().isMarked == false*/)
+            {
+                //lan hàng dọc
+                if (point.GetComponent<RectTransform>().position.x == tempList[i].GetComponent<RectTransform>().position.x)
+                {
+                    yield return new WaitForSeconds(0.2f);
+                    if (point.transform.childCount > 0)
+                    {
+                        //yield return new WaitForSeconds(0.2f);
+                        StartCoroutine(point.transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(point, tempList[i]));
+                        //point.GetComponent<Point>().isMarked = true;
+                        //tempList[i].GetComponent<Point>().isMarked = true;
+                    }
+                }
+                //lan hàng ngang
+                //else if (point.GetComponent<RectTransform>().rect.y == tempList[i].GetComponent<RectTransform>().rect.y)
+                //{
+                //    if (point.GetComponent<RectTransform>().rect.x < tempList[i].GetComponent<RectTransform>().rect.x)
+                //    {
+                //        StartCoroutine(point.transform.GetChild(1).gameObject.GetComponent<Line>().FillFullLine(point, tempList[i]));
+                //    }
+                //}
+            }
+            //yield return new WaitForSeconds(1f);
+        }
+        yield return 0;
+        //point.GetComponent<Point>().isMarked = false;
+        //foreach (var tempObj in tempList)
+        //{
+        //    tempObj.GetComponent<Point>().isMarked = false;
+        //}
     }
 
     /// <summary>
@@ -505,34 +641,36 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < points.Count; i++)
         {
-            if (points[i].GetComponent<Point>().block == false && points[i + 1].GetComponent<Point>().block == false)
+            if (points[i].GetComponent<RectTransform>().rect.x == points[i + 1].GetComponent<RectTransform>().rect.x)
             {
-                if (points[i].GetComponent<RectTransform>().rect.x == points[i + 1].GetComponent<RectTransform>().rect.x)
+                if (points[i].GetComponent<Point>().block == false && points[i + 1].GetComponent<Point>().block == false)
                 {
+
                     yield return new WaitForSeconds(0.2f);
-                    points[i].transform.GetChild(1).gameObject.GetComponent<Image>().color = Color.red;
-                    yield return new WaitForSeconds(points[i].GetComponent<Point>().pInfo.tgClick);
-                    points[i].transform.GetChild(1).gameObject.GetComponent<Image>().color = Color.cyan;
+                    //points[i].transform.GetChild(1).gameObject.GetComponent<Image>().color = Color.red;
+                    StartCoroutine(points[i].transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(points[i], points[i + 1]));
+                    //yield return new WaitForSeconds(points[i].GetComponent<Point>().pInfo.tgClick);
+                    //points[i].transform.GetChild(1).gameObject.GetComponent<Image>().color = Color.cyan;
                 }
             }
 
-            if (!Enumerable.Range(42, 48).Contains(i))
+            if (!Enumerable.Range(points.Count - genMap.columnAmount, points.Count - 1).Contains(i))
             {
-                if (points[i].GetComponent<Point>().block == false && points[i + 7].GetComponent<Point>().block == false)
+                if (points[i].GetComponent<Point>().block == false && points[i + genMap.columnAmount].GetComponent<Point>().block == false)
                 {
-                    if (points[i].GetComponent<RectTransform>().rect.x == points[i + 7].GetComponent<RectTransform>().rect.x)
+                    if (points[i].GetComponent<RectTransform>().rect.x == points[i + genMap.columnAmount].GetComponent<RectTransform>().rect.x)
                     {
                         yield return new WaitForSeconds(0.2f);
-                        points[i].transform.GetChild(0).gameObject.GetComponent<Image>().color = Color.red;
-                        yield return new WaitForSeconds(points[i].GetComponent<Point>().pInfo.tgClick);
-                        points[i].transform.GetChild(0).gameObject.GetComponent<Image>().color = Color.cyan;
+                        //points[i].transform.GetChild(0).gameObject.GetComponent<Image>().color = Color.red;
+                        StartCoroutine(points[i].transform.GetChild(0).gameObject.GetComponent<Line>().FillFullLine(points[i], points[i + genMap.columnAmount]));
+                        //yield return new WaitForSeconds(points[i].GetComponent<Point>().pInfo.tgClick);
+                        //points[i].transform.GetChild(0).gameObject.GetComponent<Image>().color = Color.cyan;
                     }
                 }
             }
         }
         yield return 0;
     }
-
 
     /// <summary>
     /// nhân combo tiền khi có point lan ra dựa vào vị trí point
@@ -542,5 +680,18 @@ public class GameManager : MonoBehaviour
     private void ComboMoney(GameObject point, int index)
     {
         money += point.GetComponent<Point>().pInfo.proClick * (1 + (index + 1) * 0.3f);
+    }
+
+    /// <summary>
+    /// khi tất cả point đã được mở
+    /// </summary>
+    /// <param name="point"></param>
+    private void ComboAllPoint(GameObject point)
+    {
+        if (activePoints.Count == points.Count)
+        {
+            effectCombo.Play();
+            money += tCombo * point.GetComponent<Point>().pInfo.proClick * (1 + ((activePoints.Count - 1) + 1) * 0.3f);
+        }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System;
 
@@ -9,16 +8,23 @@ public class Point : MonoBehaviour
     /// = true => point đang bị khóa; = false => đã mở khóa
     /// </summary>
     public bool block;
+
     /// <summary>
-    /// giá tiền để mua point tiếp theo
+    /// đánh dấu point đã duyệt
     /// </summary>
-    public float cost;
+    public bool isMarked;
+
+    /// <summary>
+    /// những point kề với point đang xét
+    /// </summary>
+    public List<GameObject> aroundPoints;
 
     public PointInfo pInfo;
     private void Start()
     {
         pInfo.thisPoint = this.gameObject;
         InvokeRepeating("AutoGetMoney", 2f, pInfo.tgPro);
+        isMarked = false;
     }
 
     private void Update()
