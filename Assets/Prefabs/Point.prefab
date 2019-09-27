@@ -133,7 +133,8 @@ MonoBehaviour:
   block: 0
   isMarked: 0
   aroundPoints: []
-  moneyPoint: {fileID: 0}
+  startSpread: 0
+  circle: {fileID: 0}
   pInfo:
     thisPoint: {fileID: 0}
     tgClick: 0
