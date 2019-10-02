@@ -23,17 +23,13 @@ public class NextLevelInfor : MonoBehaviour
         PointInfo pInf = point.GetComponent<Point>().pInfo;
 
         nextCost = pInf.prcClick * upgrade.priceUpgrade;
-        //Math.Round(nextCost, 3);
         nextMoney = pInf.proClick * upgrade.moneyEarnedUpgrade;
-        //Math.Round(nextMoney, 3);
 
         nextLevelCost.text = "+$: " + Math.Round(nextCost, 3);
         nextLevelMoney.text = "Buy: " + Math.Round(nextMoney, 3);
 
         nextCostProduct = pInf.prcPro * upgrade.priceUpgrade;
-        //Math.Round(nextCostProduct, 3);
         nextMoneyProduct = pInf.proPro * upgrade.moneyEarnedUpgrade;
-        //Math.Round(nextMoneyProduct, 3);
 
         nextLevelCostProduct.text = "+$: " + Math.Round(nextCostProduct, 3);
         nextLevelMoneyProduct.text = "Buy: " + Math.Round(nextMoneyProduct, 3);

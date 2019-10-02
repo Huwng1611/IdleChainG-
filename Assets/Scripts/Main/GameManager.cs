@@ -55,9 +55,9 @@ public class GameManager : MonoBehaviour
     /// </summary>
     /// <param name="point">point hiện tại</param>
     /// <param name="index">vị trí của point</param>
-    public void ComboMoney(GameObject point, int index)
+    public void ComboMoney(GameObject point)
     {
-        money += point.GetComponent<Point>().pInfo.proClick * (1 + (index + 1) * 0.3f);
+        money += point.GetComponent<Point>().pInfo.proClick * (1 + point.GetComponent<Point>().spreadIndex * 0.3f);
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public class GameManager : MonoBehaviour
         if (pControl.activePoints.Count == pControl.points.Count)
         {
             effectCombo.Play();
-            money += tCombo * point.GetComponent<Point>().pInfo.proClick * (1 + ((pControl.activePoints.Count - 1) + 1) * 0.3f);
+            money += tCombo * point.GetComponent<Point>().pInfo.proClick * (1 + point.GetComponent<Point>().spreadIndex * 0.3f);
         }
     }
 }

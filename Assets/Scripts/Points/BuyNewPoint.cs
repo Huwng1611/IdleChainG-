@@ -411,8 +411,8 @@ public class BuyNewPoint : MonoBehaviour
     private double CalculateCost()
     {
         numberActive = (double)(pControl.activePoints.Count + 1);
-        //var cost = 50 * Math.Pow(50, numberActive);
-        var cost = 1 * Math.Pow(1, numberActive); //giá tạm để test
+        var cost = 50 * Math.Pow(50, numberActive);
+        //var cost = 1 * Math.Pow(1, numberActive); //giá tạm để test
         return cost;
     }
 

@@ -130,13 +130,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92a50d57b3f00bb4a823c6ce42474e52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  clickCount: 0
   block: 0
-  isMarked: 0
-  aroundPoints: []
   startSpread: 0
-  circle: {fileID: 0}
+  canCollect: 0
+  pChecked: 0
+  aroundPoints: []
+  row: 0
+  col: 0
+  circle: {fileID: 1208501134862385558, guid: 3222a6bf848ec1b48b097099ac6adff2, type: 3}
+  cirlces: []
   pInfo:
-    thisPoint: {fileID: 0}
     tgClick: 0
     prcClick: 0
     proClick: 0

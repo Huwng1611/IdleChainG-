@@ -63,6 +63,7 @@
     <Compile Include="Assets\Scripts\Camera\CameraZoom.cs" />
     <Compile Include="Assets\Scripts\Main\GameManager.cs" />
     <Compile Include="Assets\Scripts\Points\BuyNewPoint.cs" />
+    <Compile Include="Assets\Scripts\Points\Circle script\CircleProperties.cs" />
     <Compile Include="Assets\Scripts\Points\GenerateMap.cs" />
     <Compile Include="Assets\Scripts\Points\NextLevelInfor.cs" />
     <Compile Include="Assets\Scripts\Points\Point.cs" />

@@ -1414,6 +1414,7 @@ MonoBehaviour:
   nextLv: {fileID: 517398909}
   effectCombo: {fileID: 1487976522}
   objTemp: {fileID: 0}
+  spreadIndex: 0
   groupButtons: {fileID: 2108580122}
 --- !u!4 &1487976521
 Transform:
