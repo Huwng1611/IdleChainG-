@@ -14,6 +14,7 @@ public class PointsController : MonoBehaviour
 
     public GameObject objTemp;
 
+
     [Header("Upgrade Buttons")]
     public GameObject groupButtons;
 
@@ -68,30 +69,12 @@ public class PointsController : MonoBehaviour
     }
 
     /// <summary>
-    /// Gán sự kiện cho point đã mở
-    /// </summary>
-    /// <param name="points"></param>
-    public void AddEventForPoint(List<GameObject> points)
-    {
-        for (int i = 0; i < points.Count; i++)
-        {
-            if (points[i].GetComponent<Image>().color == Color.white)
-            {
-                GameObject temp = points[i];
-                points[i].GetComponent<Button>().onClick.AddListener(() =>
-                {
-                    OnClickPoint(temp);
-                });
-            }
-        }
-    }
-
-    /// <summary>
     /// click lần đầu mở nút upgrade
     /// </summary>
     private void FirstClick(Point p)
     {
         groupButtons.SetActive(true);
+        nextLv.ShowInfoNextLevel(p.gameObject);
         p.clickCount = 1;
         Debug.Log("<i><color=orange>1st click</color></i>");
     }
@@ -101,7 +84,6 @@ public class PointsController : MonoBehaviour
     /// </summary>
     private void SecondClick(Point p)
     {
-        nextLv.ShowInfoNextLevel(p.gameObject);
         if (p.canCollect)
         {
             Debug.Log("<b>Point can collect </b>");
@@ -111,14 +93,6 @@ public class PointsController : MonoBehaviour
             p.spreadIndex = 1;
             SetCircleValue(p);
         }
-        //if (activePoints.Count > 1)
-        //{
-        //    GameManager.instance.ComboMoney(p.gameObject);
-        //}
-        //if (activePoints.Count == points.Count)
-        //{
-        //    GameManager.instance.ComboAllPoint(p.gameObject);
-        //}
         p.clickCount = 0;
         Debug.Log("<i><color=orange>2nd click</color></i>");
     }
@@ -129,7 +103,7 @@ public class PointsController : MonoBehaviour
     /// <param name="point">point được click</param>
     public void OnClickPoint(GameObject point)
     {
-        if (point.GetComponent<Point>().clickCount == 0)
+        if (point.GetComponent<Point>().clickCount == 0 && point.GetComponent<Point>().block == false)
         {
             FirstClick(point.GetComponent<Point>());
             return;

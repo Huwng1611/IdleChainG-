@@ -15,6 +15,27 @@ public class BuyNewPoint : MonoBehaviour
 
     public GenerateMap genMap;
     public PointsController pControl;
+
+    /// <summary>
+    /// tham số thứ nhất để tính giá point tiếp theo
+    /// </summary>
+    public float inc1;
+    /// <summary>
+    /// tham số thứ hai để tính giá point tiếp theo
+    /// </summary>
+    public float inc2;
+    //công thức tính giá point tiếp theo: inc1*inc2^n
+
+    [Header("Buy Popup")]
+    public GameObject buyPopup;
+    public Text costText;
+    public Button yesBtn;
+    public Button noBtn;
+
+    [Header("OK Popup")]
+    public GameObject okPopup;
+    public Text costTextOkPopup;
+    public Button okBtn;
     // Start is called before the first frame update
     void Start()
     {
@@ -24,7 +45,8 @@ public class BuyNewPoint : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        OpenNewPoint(pControl.points);
+        LinkedHorizontal();
+        LinkedVertical();
     }
 
     /// <summary>
@@ -46,8 +68,9 @@ public class BuyNewPoint : MonoBehaviour
                         points[i + 1].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedHorizontal();
+                            //AddPointToListActived(temp);
+                            //LinkedHorizontal();
+
                         }
                         );
                     }
@@ -57,8 +80,9 @@ public class BuyNewPoint : MonoBehaviour
                         points[i + genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedVertical();
+                            //AddPointToListActived(temp);
+                            //LinkedVertical();
+
                         }
                         );
                     }
@@ -72,8 +96,9 @@ public class BuyNewPoint : MonoBehaviour
                         points[i - 1].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedHorizontal();
+                            //AddPointToListActived(temp);
+                            //LinkedHorizontal();
+
                         }
                         );
                     }
@@ -83,8 +108,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i - genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedVertical();
+                            //AddPointToListActived(temp);
+                            //LinkedVertical();
                         }
                         );
                     }
@@ -98,8 +123,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i - 1].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedHorizontal();
+                            //AddPointToListActived(temp);
+                            //LinkedHorizontal();
                         }
                         );
                     }
@@ -109,8 +134,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i + genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedVertical();
+                            //AddPointToListActived(temp);
+                            //LinkedVertical();
                         }
                         );
                     }
@@ -124,8 +149,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i + 1].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedHorizontal();
+                            //AddPointToListActived(temp);
+                            //LinkedHorizontal();
                         }
                         );
                     }
@@ -135,8 +160,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i - genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedVertical();
+                            //AddPointToListActived(temp);
+                            //LinkedVertical();
                         }
                         );
                     }
@@ -150,8 +175,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i + genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedVertical();
+                            //AddPointToListActived(temp);
+                            //LinkedVertical();
                         }
                         );
                     }
@@ -161,8 +186,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i + 1].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedHorizontal();
+                            //AddPointToListActived(temp);
+                            //LinkedHorizontal();
                         }
                         );
                     }
@@ -172,8 +197,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i - 1].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedHorizontal();
+                            //AddPointToListActived(temp);
+                            //LinkedHorizontal();
                         }
                         );
                     }
@@ -187,8 +212,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i - 1].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedHorizontal();
+                            //AddPointToListActived(temp);
+                            //LinkedHorizontal();
                         }
                         );
                     }
@@ -198,8 +223,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i - genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedVertical();
+                            //AddPointToListActived(temp);
+                            //LinkedVertical();
                         }
                         );
                     }
@@ -209,8 +234,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i + 1].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedHorizontal();
+                            //AddPointToListActived(temp);
+                            //LinkedHorizontal();
                         }
                         );
                     }
@@ -224,8 +249,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i + 1].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedHorizontal();
+                            //AddPointToListActived(temp);
+                            //LinkedHorizontal();
                         }
                         );
                     }
@@ -235,8 +260,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i + genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedVertical();
+                            //AddPointToListActived(temp);
+                            //LinkedVertical();
                         }
                         );
                     }
@@ -246,8 +271,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i - genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedVertical();
+                            //AddPointToListActived(temp);
+                            //LinkedVertical();
                         }
                         );
                     }
@@ -261,8 +286,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i - 1].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedHorizontal();
+                            //AddPointToListActived(temp);
+                            //LinkedHorizontal();
                         }
                         );
                     }
@@ -272,8 +297,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i + genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedVertical();
+                            //AddPointToListActived(temp);
+                            //LinkedVertical();
                         }
                         );
                     }
@@ -283,8 +308,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i - genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedVertical();
+                            //AddPointToListActived(temp);
+                            //LinkedVertical();
                         }
                         );
                     }
@@ -298,10 +323,11 @@ public class BuyNewPoint : MonoBehaviour
                         points[i - 1].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedHorizontal();
+                            //AddPointToListActived(temp);
+                            //LinkedHorizontal();
                         }
                         );
+
                     }
                     if (points[i + 1].GetComponent<Point>().block == true)
                     {
@@ -309,10 +335,11 @@ public class BuyNewPoint : MonoBehaviour
                         points[i + 1].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedHorizontal();
+                            //AddPointToListActived(temp);
+                            //LinkedHorizontal();
                         }
                         );
+
                     }
                     if (points[i - genMap.columnAmount].GetComponent<Point>().block == true)
                     {
@@ -320,8 +347,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i - genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedVertical();
+                            //AddPointToListActived(temp);
+                            //LinkedVertical();
                         }
                         );
                     }
@@ -331,8 +358,8 @@ public class BuyNewPoint : MonoBehaviour
                         points[i + genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
                         {
                             UnlockNewPoint(temp);
-                            AddPointToListActived(temp);
-                            LinkedVertical();
+                            //AddPointToListActived(temp);
+                            //LinkedVertical();
                         }
                         );
                     }
@@ -352,25 +379,54 @@ public class BuyNewPoint : MonoBehaviour
             float costOfNextPoint = (float)CalculateCost();
             if (GameManager.instance.money > costOfNextPoint)
             {
-                float tempMoney = GameManager.instance.money;
-                GameManager.instance.money = tempMoney - costOfNextPoint;
-                point.GetComponent<Point>().enabled = true;
-                point.GetComponent<Point>().block = false;
-                point.GetComponent<Point>().canCollect = true;
-                point.GetComponent<Point>().startSpread = false;
-                point.GetComponent<Image>().color = Color.white;
-                genMap.AddAllAroundPoints();
-                //genMap.AddAroundPointOfCurrentPoint();
-
-                //Gán sự kiện click kiếm tiền vào point mới
-                point.GetComponent<Button>().onClick.AddListener(() =>
+                if (point.GetComponent<Point>().block == true)
                 {
-                    pControl.OnClickPoint(point);
-                });
+                    buyPopup.SetActive(true);
+                    costText.text = "Giá: " + costOfNextPoint + "$";
+
+                    yesBtn.onClick.AddListener(() =>
+                    {
+                        buyPopup.SetActive(false);
+                        GameManager.instance.money -= costOfNextPoint;
+                        point.GetComponent<Point>().enabled = true;
+                        point.GetComponent<Point>().block = false;
+                        point.GetComponent<Point>().canCollect = true;
+                        point.GetComponent<Point>().startSpread = false;
+                        point.GetComponent<Image>().color = Color.white;
+                        //yesBtn.onClick.RemoveAllListeners();
+                        AddPointToListActived(point);
+                        //Gán sự kiện click kiếm tiền vào point mới
+                        point.GetComponent<Button>().onClick.AddListener(() =>
+                        {
+                            pControl.OnClickPoint(point);
+                        });
+                        genMap.AddAllAroundPoints();
+                    });
+
+                    //if (point.GetComponent<Point>().block == false)
+                    //{
+                    //    return;
+                    //}
+
+                    noBtn.onClick.AddListener(() =>
+                    {
+                        buyPopup.SetActive(false);
+                        //point.GetComponent<Point>().enabled = false;
+                        //noBtn.onClick.RemoveAllListeners();
+                        yesBtn.onClick.RemoveAllListeners();
+                    });
+                    return;
+                }
                 return;
             }
             else
             {
+                okPopup.SetActive(true);
+                costTextOkPopup.text = "Cần " + (float)CalculateCost() + "$";
+                okBtn.onClick.AddListener(() =>
+                {
+                    okPopup.SetActive(false);
+                });
                 return;
             }
         }
@@ -388,18 +444,25 @@ public class BuyNewPoint : MonoBehaviour
     {
         if (!pControl.activePoints.Contains(temp))
         {
-            pControl.activePoints.Add(temp);
-            int index = pControl.activePoints.IndexOf(temp);
-            PointInfo pInf = temp.GetComponent<Point>().pInfo;
+            if (temp.GetComponent<Point>().block == false)
+            {
+                pControl.activePoints.Add(temp);
+                int index = pControl.activePoints.IndexOf(temp);
+                PointInfo pInf = temp.GetComponent<Point>().pInfo;
 
-            pInf.tgClick = (float)Math.Pow(2, index);
-            pInf.prcClick = (float)Math.Pow(10, index);
-            pInf.proClick = (float)Math.Pow(10, index);
+                pInf.tgClick = (float)Math.Pow(2, index);
+                pInf.prcClick = (float)Math.Pow(10, index);
+                pInf.proClick = (float)Math.Pow(10, index);
 
-            pInf.tgPro = (float)Math.Pow(2, index);
-            pInf.prcPro = (float)Math.Pow(10, index);
-            pInf.proPro = (float)Math.Pow(10, index);
+                pInf.tgPro = (float)Math.Pow(2, index);
+                pInf.prcPro = (float)Math.Pow(10, index);
+                pInf.proPro = (float)Math.Pow(10, index);
 
+                temp.GetComponent<Button>().onClick.RemoveListener(() =>
+                {
+                    OpenNewPoint(pControl.points);
+                });
+            }
             //CombopControl.money(temp, pControl.activePoints.IndexOf(temp));
         }
     }
@@ -411,8 +474,7 @@ public class BuyNewPoint : MonoBehaviour
     private double CalculateCost()
     {
         numberActive = (double)(pControl.activePoints.Count + 1);
-        var cost = 50 * Math.Pow(50, numberActive);
-        //var cost = 1 * Math.Pow(1, numberActive); //giá tạm để test
+        var cost = inc1 * Math.Pow(inc2, numberActive);
         return cost;
     }
 

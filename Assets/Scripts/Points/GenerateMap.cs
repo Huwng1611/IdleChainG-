@@ -8,8 +8,8 @@ public class GenerateMap : MonoBehaviour
     public Transform parentMap;
     public GameObject point;
     public GameObject line;
-    public GameObject circle;
     public PointsController pControl;
+    public BuyNewPoint buyP;
 
     public int freeFirstPoint;
 
@@ -36,6 +36,10 @@ public class GenerateMap : MonoBehaviour
         pControl.points[freeFirstPoint].GetComponent<Point>().enabled = true;
         pControl.points[freeFirstPoint].GetComponent<Point>().block = false;
         pControl.points[freeFirstPoint].GetComponent<Point>().canCollect = true;
+        pControl.points[freeFirstPoint].GetComponent<Button>().onClick.AddListener(() =>
+        {
+            pControl.OnClickPoint(pControl.points[freeFirstPoint]);
+        });
         pControl.activePoints.Add(pControl.points[freeFirstPoint]);
     }
 
@@ -50,16 +54,25 @@ public class GenerateMap : MonoBehaviour
                 obj.GetComponent<Point>().block = true;
                 obj.GetComponent<Point>().enabled = false;
                 obj.GetComponent<Point>().canCollect = false;
+                obj.GetComponent<Button>().onClick.AddListener(() =>
+                {
+                    buyP.OpenNewPoint(pControl.points);
+                });
                 pControl.points.Add(obj);
-                //pControl.pArray[i, j] = obj;
             }
         }
         GetAFreePoint();
         AddAllAroundPoints();
-
-        pControl.AddEventForPoint(pControl.points);
         DefaultValueFirstPoint(pControl.points[freeFirstPoint]);
         StartCoroutine(DrawLineMap());
+
+        //foreach (var p in pControl.points)
+        //{
+        //    p.GetComponent<Button>().onClick.AddListener(() =>
+        //    {
+        //        buyP.OpenNewPoint(pControl.points);
+        //    });
+        //}
         Debug.Log("<color=green> New way to gen map! </color>");
     }
 

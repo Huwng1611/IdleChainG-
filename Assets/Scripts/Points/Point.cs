@@ -55,7 +55,7 @@ public class Point : MonoBehaviour
     {
         startSpread = false;
 
-        //InvokeRepeating("AutoGetMoney", 2f, pInfo.tgPro);
+        InvokeRepeating("AutoGetMoney", 2f, pInfo.tgPro);
         SpawnCircle();
         pControl = FindObjectOfType<PointsController>();
     }
