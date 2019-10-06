@@ -897,8 +897,8 @@ MonoBehaviour:
   numberActive: 0
   genMap: {fileID: 1439190083}
   pControl: {fileID: 1487976520}
-  inc1: 1
-  inc2: 1
+  inc1: 50
+  inc2: 50
   proInc: 10
   tgInc: 2
   buyPopup: {fileID: 99475438}
