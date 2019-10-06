@@ -33,7 +33,6 @@ public class Upgrade : MonoBehaviour
             pInf.tgClick /= coolDownUpgrade;
             pInf.prcClick *= priceUpgrade;
             pInf.proClick *= moneyEarnedUpgrade;
-            pControl.groupButtons.SetActive(false);
         }
     }
 
@@ -51,7 +50,7 @@ public class Upgrade : MonoBehaviour
             pInf.tgPro /= coolDownUpgrade;
             pInf.prcPro *= priceUpgrade;
             pInf.proPro *= moneyEarnedUpgrade;
-            pControl.groupButtons.SetActive(false);
+
         }
     }
 }

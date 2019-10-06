@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -7,38 +8,16 @@ using UnityEngine.UI;
 public class PointsController : MonoBehaviour
 {
     public List<GameObject> points;
-    public List<GameObject> activePoints;
 
     public NextLevelInfor nextLv;
     public ParticleSystem effectCombo;
 
     public GameObject objTemp;
 
-
-    [Header("Upgrade Buttons")]
-    public GameObject groupButtons;
-
     // Start is called before the first frame update
     void Start()
     {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        ResetCheckPoint();
-    }
-
-    /// <summary>
-    /// check toàn bộ point đã mở
-    /// </summary>
-    /// <returns></returns>
-    private bool CheckAllPoints()
-    {
-        bool check = activePoints.TrueForAll(p => p.GetComponent<Point>().pChecked == true
-        && p.GetComponent<Point>().startSpread == true);
-        return check;
+        InvokeRepeating("ResetCheckPoint", 0f, 2f);
     }
 
     /// <summary>
@@ -46,9 +25,9 @@ public class PointsController : MonoBehaviour
     /// </summary>
     private void ResetCheckPoint()
     {
-        if (CheckAllPoints() == true)
+        foreach (var p in points)
         {
-            foreach (var p in activePoints)
+            if (!p.GetComponent<Point>().block && p.GetComponent<Point>().pChecked && p.GetComponent<Point>().startSpread)
             {
                 p.GetComponent<Point>().pChecked = false;
                 p.GetComponent<Point>().startSpread = false;
@@ -69,50 +48,23 @@ public class PointsController : MonoBehaviour
     }
 
     /// <summary>
-    /// click lần đầu mở nút upgrade
-    /// </summary>
-    private void FirstClick(Point p)
-    {
-        groupButtons.SetActive(true);
-        nextLv.ShowInfoNextLevel(p.gameObject);
-        p.clickCount = 1;
-        Debug.Log("<i><color=orange>1st click</color></i>");
-    }
-
-    /// <summary>
-    /// click lần 2 thì thu tiền về
-    /// </summary>
-    private void SecondClick(Point p)
-    {
-        if (p.canCollect)
-        {
-            Debug.Log("<b>Point can collect </b>");
-            StartCoroutine(CoolDownToNextClick(p.gameObject));
-            ClickGetMoney(p.gameObject);
-            p.startSpread = true;
-            p.spreadIndex = 1;
-            SetCircleValue(p);
-        }
-        p.clickCount = 0;
-        Debug.Log("<i><color=orange>2nd click</color></i>");
-    }
-
-    /// <summary>
     /// Sự kiện click point
     /// </summary>
     /// <param name="point">point được click</param>
     public void OnClickPoint(GameObject point)
     {
-        if (point.GetComponent<Point>().clickCount == 0 && point.GetComponent<Point>().block == false)
+        Debug.Log(point.name);
+        nextLv.ShowInfoNextLevel(point);
+        if (point.GetComponent<Point>().canCollect)
         {
-            FirstClick(point.GetComponent<Point>());
-            return;
+            //Debug.Log("<b>Point can collect </b>");
+            StartCoroutine(CoolDownToNextClick(point));
+            ClickGetMoney(point);
+            point.GetComponent<Point>().startSpread = true;
+            point.GetComponent<Point>().spreadIndex = 1;
+            SetCircleValue(point.GetComponent<Point>());
         }
-        if (point.GetComponent<Point>().clickCount == 1 && point.GetComponent<Image>().color == Color.white)
-        {
-            SecondClick(point.GetComponent<Point>());
-            return;
-        }
+        GameManager.instance.moneyText.text = "$: " + Math.Round(GameManager.instance.money, 3).ToString();
     }
 
     /// <summary>
@@ -139,7 +91,7 @@ public class PointsController : MonoBehaviour
         PointInfo pInf = point.GetComponent<Point>().pInfo;
         GameManager.instance.money += pInf.proClick;
         GameManager.instance.moneyText.text = "$: " + GameManager.instance.money;
-        point = EventSystem.current.currentSelectedGameObject;
+        //point = EventSystem.current.currentSelectedGameObject;
         objTemp = point;
     }
 }

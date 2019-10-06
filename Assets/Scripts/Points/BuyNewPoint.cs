@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class BuyNewPoint : MonoBehaviour
@@ -11,7 +12,7 @@ public class BuyNewPoint : MonoBehaviour
     /// <summary>
     /// số các point đã mở, dùng để tính giá mở point tiếp theo
     /// </summary>
-    public double numberActive;
+    public float numberActive;
 
     public GenerateMap genMap;
     public PointsController pControl;
@@ -25,6 +26,15 @@ public class BuyNewPoint : MonoBehaviour
     /// </summary>
     public float inc2;
     //công thức tính giá point tiếp theo: inc1*inc2^n
+
+    /// <summary>
+    /// tính số tiền sau click của point mới
+    /// </summary>
+    public float proInc;
+    /// <summary>
+    /// thời gian cooldown của point mới
+    /// </summary>
+    public float tgInc;
 
     [Header("Buy Popup")]
     public GameObject buyPopup;
@@ -42,329 +52,16 @@ public class BuyNewPoint : MonoBehaviour
         numberActive = 1;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        LinkedHorizontal();
-        LinkedVertical();
-    }
-
     /// <summary>
-    /// mở point mới
+    /// mở thêm point mới
     /// </summary>
-    /// <param name="points"></param>
-    public void OpenNewPoint(List<GameObject> points)
+    public void OpenNewPoint()
     {
-        for (int i = 0; i < points.Count; i++)
+        GameObject point = EventSystem.current.currentSelectedGameObject;
+        //EventSystem.current.SetSelectedGameObject(point);
+        if (point.GetComponent<Point>().aroundPoints.Count(p => p.GetComponent<Point>().block == false) > 0)
         {
-            if (points[i].GetComponent<Point>().block == false) //điều kiện để chỉ được mở point có nối với nhau
-            {
-                //điểm đầu 
-                if (i == 0)
-                {
-                    if (points[i + 1].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i + 1];
-                        points[i + 1].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedHorizontal();
-
-                        }
-                        );
-                    }
-                    if (points[i + genMap.columnAmount].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i + genMap.columnAmount];
-                        points[i + genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedVertical();
-
-                        }
-                        );
-                    }
-                }
-                //điểm cuối 
-                else if (i == points.Count - 1)
-                {
-                    if (points[i - 1].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i - 1];
-                        points[i - 1].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedHorizontal();
-
-                        }
-                        );
-                    }
-                    if (points[i - genMap.columnAmount].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i - genMap.columnAmount];
-                        points[i - genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedVertical();
-                        }
-                        );
-                    }
-                }
-                //point phải hàng đầu
-                else if (i == genMap.columnAmount - 1)
-                {
-                    if (points[i - 1].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i - 1];
-                        points[i - 1].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedHorizontal();
-                        }
-                        );
-                    }
-                    if (points[i + genMap.columnAmount].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i + genMap.columnAmount];
-                        points[i + genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedVertical();
-                        }
-                        );
-                    }
-                }
-                //point trái hàng cuối
-                else if (i == points.Count - genMap.columnAmount)
-                {
-                    if (points[i + 1].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i + 1];
-                        points[i + 1].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedHorizontal();
-                        }
-                        );
-                    }
-                    if (points[i - genMap.columnAmount].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i - genMap.columnAmount];
-                        points[i - genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedVertical();
-                        }
-                        );
-                    }
-                }
-                //hàng đầu tiên trừ 2 point đầu mút
-                else if (Enumerable.Range(1, genMap.columnAmount - 1 - 1).Contains(i))
-                {
-                    if (points[i + genMap.columnAmount].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i + genMap.columnAmount];
-                        points[i + genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedVertical();
-                        }
-                        );
-                    }
-                    if (points[i + 1].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i + 1];
-                        points[i + 1].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedHorizontal();
-                        }
-                        );
-                    }
-                    if (i != 0 && points[i - 1].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i - 1];
-                        points[i - 1].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedHorizontal();
-                        }
-                        );
-                    }
-                }
-                //hàng cuối cùng trừ 2 point đầu mút
-                else if (Enumerable.Range(points.Count - genMap.columnAmount + 1, points.Count - 1 - 1).Contains(i))
-                {
-                    if (points[i - 1].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i - 1];
-                        points[i - 1].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedHorizontal();
-                        }
-                        );
-                    }
-                    if (points[i - genMap.columnAmount].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i - genMap.columnAmount];
-                        points[i - genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedVertical();
-                        }
-                        );
-                    }
-                    if (points[i + 1].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i + 1];
-                        points[i + 1].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedHorizontal();
-                        }
-                        );
-                    }
-                }
-                //cột đầu trừ 2 point đầu mút
-                else if (i != 0 && i != points.Count - genMap.columnAmount && i % genMap.columnAmount == 0)
-                {
-                    if (points[i + 1].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i + 1];
-                        points[i + 1].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedHorizontal();
-                        }
-                        );
-                    }
-                    if (points[i + genMap.columnAmount].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i + genMap.columnAmount];
-                        points[i + genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedVertical();
-                        }
-                        );
-                    }
-                    if (points[i - genMap.columnAmount].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i - genMap.columnAmount];
-                        points[i - genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedVertical();
-                        }
-                        );
-                    }
-                }
-                //cột cuối trừ 2 point đầu mút
-                else if (i != genMap.columnAmount - 1 && i != points.Count - 1 && i % genMap.columnAmount == genMap.columnAmount - 1)
-                {
-                    if (points[i - 1].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i - 1];
-                        points[i - 1].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedHorizontal();
-                        }
-                        );
-                    }
-                    if (points[i + genMap.columnAmount].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i + genMap.columnAmount];
-                        points[i + genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedVertical();
-                        }
-                        );
-                    }
-                    if (points[i - genMap.columnAmount].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i - genMap.columnAmount];
-                        points[i - genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedVertical();
-                        }
-                        );
-                    }
-                }
-                //các điểm nằm giữa
-                else
-                {
-                    if (points[i - 1].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i - 1];
-                        points[i - 1].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedHorizontal();
-                        }
-                        );
-
-                    }
-                    if (points[i + 1].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i + 1];
-                        points[i + 1].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedHorizontal();
-                        }
-                        );
-
-                    }
-                    if (points[i - genMap.columnAmount].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i - genMap.columnAmount];
-                        points[i - genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedVertical();
-                        }
-                        );
-                    }
-                    if (points[i + genMap.columnAmount].GetComponent<Point>().block == true)
-                    {
-                        GameObject temp = points[i + genMap.columnAmount];
-                        points[i + genMap.columnAmount].GetComponent<Button>().onClick.AddListener(() =>
-                        {
-                            UnlockNewPoint(temp);
-                            //AddPointToListActived(temp);
-                            //LinkedVertical();
-                        }
-                        );
-                    }
-                }
-            }
+            UnlockNewPoint(point);
         }
     }
 
@@ -377,7 +74,7 @@ public class BuyNewPoint : MonoBehaviour
         if (point.GetComponent<Image>().color != Color.white)
         {
             float costOfNextPoint = (float)CalculateCost();
-            if (GameManager.instance.money > costOfNextPoint)
+            if (GameManager.instance.money >= costOfNextPoint)
             {
                 if (point.GetComponent<Point>().block == true)
                 {
@@ -386,34 +83,33 @@ public class BuyNewPoint : MonoBehaviour
 
                     yesBtn.onClick.AddListener(() =>
                     {
-                        buyPopup.SetActive(false);
-                        GameManager.instance.money -= costOfNextPoint;
-                        point.GetComponent<Point>().enabled = true;
-                        point.GetComponent<Point>().block = false;
-                        point.GetComponent<Point>().canCollect = true;
-                        point.GetComponent<Point>().startSpread = false;
-                        point.GetComponent<Image>().color = Color.white;
-                        //yesBtn.onClick.RemoveAllListeners();
-                        AddPointToListActived(point);
-                        //Gán sự kiện click kiếm tiền vào point mới
-                        point.GetComponent<Button>().onClick.AddListener(() =>
+                        if (point.GetComponent<Point>().block)
                         {
-                            pControl.OnClickPoint(point);
-                        });
-                        genMap.AddAllAroundPoints();
+                            buyPopup.SetActive(false);
+                            GameManager.instance.money -= costOfNextPoint;
+                            point.GetComponent<Point>().enabled = true;
+                            point.GetComponent<Image>().color = Color.white;
+                            point.GetComponent<Point>().block = false;
+                            point.GetComponent<Point>().canCollect = true;
+                            point.GetComponent<Point>().startSpread = false;
+                            SetPropertiesForNewPoint(point);
+                            point.GetComponent<Button>().onClick.RemoveAllListeners();
+                            //Gán sự kiện click vào point mới
+                            point.GetComponent<Button>().onClick.AddListener(() =>
+                            {
+                                pControl.OnClickPoint(point);
+                            });
+                            //genMap.AddAllAroundPoints();
+                            LinkedHorizontal();
+                            LinkedVertical();
+                            GameManager.instance.moneyText.text = "$: " + Math.Round(GameManager.instance.money, 3).ToString();
+                        }
                     });
-
-                    //if (point.GetComponent<Point>().block == false)
-                    //{
-                    //    return;
-                    //}
 
                     noBtn.onClick.AddListener(() =>
                     {
-                        buyPopup.SetActive(false);
-                        //point.GetComponent<Point>().enabled = false;
-                        //noBtn.onClick.RemoveAllListeners();
                         yesBtn.onClick.RemoveAllListeners();
+                        buyPopup.SetActive(false);
                     });
                     return;
                 }
@@ -437,33 +133,28 @@ public class BuyNewPoint : MonoBehaviour
     }
 
     /// <summary>
-    /// thêm point vừa mở vào 1 list chứa các point đã mở
+    /// tạo các thông số của point mới
     /// </summary>
     /// <param name="temp"></param>
-    private void AddPointToListActived(GameObject temp)
+    private void SetPropertiesForNewPoint(GameObject temp)
     {
-        if (!pControl.activePoints.Contains(temp))
+        if (temp.GetComponent<Point>().block == false)
         {
-            if (temp.GetComponent<Point>().block == false)
+            numberActive = pControl.points.Count(p => p.GetComponent<Point>().block == false) - 1;
+            PointInfo pInf = temp.GetComponent<Point>().pInfo;
+
+            pInf.tgClick = (float)Math.Pow(tgInc, numberActive);
+            pInf.prcClick = (float)Math.Pow(proInc, numberActive);
+            pInf.proClick = (float)Math.Pow(proInc, numberActive);
+
+            pInf.tgPro = (float)Math.Pow(tgInc, numberActive);
+            pInf.prcPro = (float)Math.Pow(proInc, numberActive);
+            pInf.proPro = (float)Math.Pow(proInc, numberActive);
+
+            temp.GetComponent<Button>().onClick.RemoveListener(() =>
             {
-                pControl.activePoints.Add(temp);
-                int index = pControl.activePoints.IndexOf(temp);
-                PointInfo pInf = temp.GetComponent<Point>().pInfo;
-
-                pInf.tgClick = (float)Math.Pow(2, index);
-                pInf.prcClick = (float)Math.Pow(10, index);
-                pInf.proClick = (float)Math.Pow(10, index);
-
-                pInf.tgPro = (float)Math.Pow(2, index);
-                pInf.prcPro = (float)Math.Pow(10, index);
-                pInf.proPro = (float)Math.Pow(10, index);
-
-                temp.GetComponent<Button>().onClick.RemoveListener(() =>
-                {
-                    OpenNewPoint(pControl.points);
-                });
-            }
-            //CombopControl.money(temp, pControl.activePoints.IndexOf(temp));
+                OpenNewPoint();
+            });
         }
     }
 
@@ -471,10 +162,10 @@ public class BuyNewPoint : MonoBehaviour
     /// tính toán giá tiền của point
     /// </summary>
     /// <returns></returns>
-    private double CalculateCost()
+    private float CalculateCost()
     {
-        numberActive = (double)(pControl.activePoints.Count + 1);
-        var cost = inc1 * Math.Pow(inc2, numberActive);
+        numberActive = pControl.points.Count(p => p.GetComponent<Point>().block == false) - 1;
+        var cost = inc1 * (float)Math.Pow(inc2, numberActive);
         return cost;
     }
 

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System;
+using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
@@ -37,24 +38,10 @@ public class GameManager : MonoBehaviour
         moneyText.text = "$: " + money.ToString();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (money < 0)
-        {
-            money = 0;
-        }
-        else
-        {
-            moneyText.text = "$: " + Math.Round(money, 3).ToString();
-        }
-    }
-
     /// <summary>
     /// nhân combo tiền khi có point lan ra dựa vào vị trí point
     /// </summary>
     /// <param name="point">point hiện tại</param>
-    /// <param name="index">vị trí của point</param>
     public void ComboMoney(GameObject point)
     {
         money += point.GetComponent<Point>().pInfo.proClick * (1 + point.GetComponent<Point>().spreadIndex * 0.3f);
@@ -66,7 +53,7 @@ public class GameManager : MonoBehaviour
     /// <param name="point"></param>
     public void ComboAllPoint(GameObject point)
     {
-        if (pControl.activePoints.Count == pControl.points.Count)
+        if (pControl.points.Count(p => p.GetComponent<Point>().block == false) == pControl.points.Count)
         {
             effectCombo.Play();
             money += tCombo * point.GetComponent<Point>().pInfo.proClick * (1 + point.GetComponent<Point>().spreadIndex * 0.3f);

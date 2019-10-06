@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class GenerateMap : MonoBehaviour
@@ -24,11 +25,6 @@ public class GenerateMap : MonoBehaviour
         CreateMap();
     }
 
-    private void Update()
-    {
-
-    }
-
     private void GetAFreePoint()
     {
         freeFirstPoint = Random.Range(pControl.points.Count - 1, pControl.points.IndexOf(pControl.points[0]));
@@ -36,11 +32,14 @@ public class GenerateMap : MonoBehaviour
         pControl.points[freeFirstPoint].GetComponent<Point>().enabled = true;
         pControl.points[freeFirstPoint].GetComponent<Point>().block = false;
         pControl.points[freeFirstPoint].GetComponent<Point>().canCollect = true;
+        pControl.points[freeFirstPoint].GetComponent<Button>().onClick.RemoveListener(() =>
+        {
+            buyP.OpenNewPoint();
+        });
         pControl.points[freeFirstPoint].GetComponent<Button>().onClick.AddListener(() =>
         {
             pControl.OnClickPoint(pControl.points[freeFirstPoint]);
         });
-        pControl.activePoints.Add(pControl.points[freeFirstPoint]);
     }
 
     private void CreateMap()
@@ -56,7 +55,7 @@ public class GenerateMap : MonoBehaviour
                 obj.GetComponent<Point>().canCollect = false;
                 obj.GetComponent<Button>().onClick.AddListener(() =>
                 {
-                    buyP.OpenNewPoint(pControl.points);
+                    buyP.OpenNewPoint();
                 });
                 pControl.points.Add(obj);
             }
@@ -65,14 +64,6 @@ public class GenerateMap : MonoBehaviour
         AddAllAroundPoints();
         DefaultValueFirstPoint(pControl.points[freeFirstPoint]);
         StartCoroutine(DrawLineMap());
-
-        //foreach (var p in pControl.points)
-        //{
-        //    p.GetComponent<Button>().onClick.AddListener(() =>
-        //    {
-        //        buyP.OpenNewPoint(pControl.points);
-        //    });
-        //}
         Debug.Log("<color=green> New way to gen map! </color>");
     }
 
@@ -99,7 +90,6 @@ public class GenerateMap : MonoBehaviour
     /// <returns></returns>
     private IEnumerator DrawLineMap()
     {
-        // cần sửa lại hàm này để phù hợp cho point lan
         for (int i = 0; i < pControl.points.Count; i++)
         {
             for (int j = 0; j < pControl.points.Count; j++)
@@ -111,8 +101,9 @@ public class GenerateMap : MonoBehaviour
                         GameObject ln = Instantiate(line, pControl.points[i].gameObject.transform);
                         Vector3 temp;
                         temp = ln.transform.position;
-                        temp.y -= 100;
+                        temp.y -= 95;
                         ln.transform.position = temp;
+                        ln.GetComponent<Image>().raycastTarget = false;
                     }
                 }
                 if (pControl.points[i].GetComponent<RectTransform>().rect.y == pControl.points[j].GetComponent<RectTransform>().rect.y)
@@ -122,8 +113,9 @@ public class GenerateMap : MonoBehaviour
                         GameObject ln = Instantiate(line, pControl.points[i].gameObject.transform.position, Quaternion.Euler(0f, 0f, 90f), pControl.points[i].transform);
                         Vector3 temp;
                         temp = ln.transform.position;
-                        temp.x += 100;
+                        temp.x += 95;
                         ln.transform.position = temp;
+                        ln.GetComponent<Image>().raycastTarget = false;
                         if (Enumerable.Range(pControl.points.Count - columnAmount, pControl.points.Count - 1).Contains(i))
                         {
                             Destroy(pControl.points[i].transform.GetChild(0).gameObject);
@@ -146,135 +138,135 @@ public class GenerateMap : MonoBehaviour
     {
         for (int i = 0; i < pControl.points.Count; i++)
         {
-            if (pControl.points[i].GetComponent<Point>().block == false)
+            //if (pControl.points[i].GetComponent<Point>().block == false)
+            //{
+            //point góc trái hàng đầu
+            if (i == 0)
             {
-                //point góc trái hàng đầu
-                if (i == 0)
+                if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + 1])
+                    && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + columnAmount]))
                 {
-                    if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + 1])
-                        && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + columnAmount]))
-                    {
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + 1]);
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + columnAmount]);
-                    }
-                    //pControl.points[i].GetComponent<Point>().aroundP1, 2] = pControl.points[i + 1];
-                    //pControl.points[i].GetComponent<Point>().aroundP2, 1] = pControl.points[i + columnAmount];
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + 1]);
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + columnAmount]);
                 }
-                //point góc phải hàng đầu
-                else if (i == columnAmount - 1)
-                {
-                    if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - 1])
-                        && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + columnAmount]))
-                    {
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - 1]);
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + columnAmount]);
-                    }
-                    //pControl.points[i].GetComponent<Point>().aroundP1, 0] = pControl.points[i - 1];
-                    //pControl.points[i].GetComponent<Point>().aroundP2, 1] = pControl.points[i + columnAmount];
-                }
-                //point góc trái hàng cuối
-                else if (i == pControl.points.Count - columnAmount)
-                {
-                    if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + 1])
-                        && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - columnAmount]))
-                    {
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + 1]);
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - columnAmount]);
-                    }
-                    //pControl.points[i].GetComponent<Point>().aroundP1, 2] = pControl.points[i + 1];
-                    //pControl.points[i].GetComponent<Point>().aroundP0, 1] = pControl.points[i - columnAmount];
-                }
-                //ponint góc phải hàng cuối
-                else if (i == pControl.points.Count - 1)
-                {
-                    if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - 1])
-                        && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - columnAmount]))
-                    {
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - 1]);
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - columnAmount]);
-                    }
-                    //pControl.points[i].GetComponent<Point>().aroundP1, 0] = pControl.points[i - 1];
-                    //pControl.points[i].GetComponent<Point>().aroundP0, 1] = pControl.points[i - columnAmount];
-                }
-                //các points hàng đầu tiên (trừ 2 point đầu mút)
-                else if (Enumerable.Range(1, columnAmount - 1 - 1).Contains(i))
-                {
-                    if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - 1])
-                        && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + 1])
-                        && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + columnAmount]))
-                    {
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - 1]);
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + 1]);
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + columnAmount]);
-                    }
-                    //pControl.points[i].GetComponent<Point>().aroundP1, 0] = pControl.points[i - 1];
-                    //pControl.points[i].GetComponent<Point>().aroundP1, 2] = pControl.points[i + 1];
-                    //pControl.points[i].GetComponent<Point>().aroundP2, 1] = pControl.points[i + columnAmount];
-                }
-                //các point hàng cuối cùng (trừ 2 point đầu mút)
-                else if (Enumerable.Range(pControl.points.Count - columnAmount + 1, pControl.points.Count - 1 - 1).Contains(i))
-                {
-                    if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - 1])
-                        && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + 1])
-                        && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - columnAmount]))
-                    {
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - 1]);
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + 1]);
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - columnAmount]);
-                    }
-                    //pControl.points[i].GetComponent<Point>().aroundP1, 0] = pControl.points[i - 1];
-                    //pControl.points[i].GetComponent<Point>().aroundP1, 2] = pControl.points[i + 1];
-                    //pControl.points[i].GetComponent<Point>().aroundP0, 1] = pControl.points[i - columnAmount];
-                }
-                //các point cột đầu (trừ 2 point đầu mút)
-                else if (i != 0 && i % columnAmount == 0)
-                {
-                    if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + 1])
-                        && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - columnAmount])
-                        && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + columnAmount]))
-                    {
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + 1]);
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - columnAmount]);
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + columnAmount]);
-                    }
-                    //pControl.points[i].GetComponent<Point>().aroundP1, 2] = pControl.points[i + 1];
-                    //pControl.points[i].GetComponent<Point>().aroundP0, 1] = pControl.points[i - columnAmount];
-                    //pControl.points[i].GetComponent<Point>().aroundP2, 1] = pControl.points[i + columnAmount];
-                }
-                //các point cột cuối (trừ 2 point đàu mút)
-                else if (i != (columnAmount - 1) && i != pControl.points.Count - 1 && i % columnAmount == (columnAmount - 1))
-                {
-                    if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - 1])
-                       && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - columnAmount])
-                       && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + columnAmount]))
-                    {
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - 1]);
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - columnAmount]);
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + columnAmount]);
-                    }
-                    //pControl.points[i].GetComponent<Point>().aroundP1, 0] = pControl.points[i - 1];
-                    //pControl.points[i].GetComponent<Point>().aroundP0, 1] = pControl.points[i - columnAmount];
-                    //pControl.points[i].GetComponent<Point>().aroundP2, 1] = pControl.points[i + columnAmount];
-                }
-                //các point nằm giữa
-                else
-                {
-                    if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - 1])
-                       && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + 1])
-                       && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - columnAmount])
-                       && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + columnAmount]))
-                    {
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - 1]);
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + 1]);
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - columnAmount]);
-                        pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + columnAmount]);
-                    }
-                    //pControl.points[i].GetComponent<Point>().aroundP1, 2] = pControl.points[i + 1];
-                    //pControl.points[i].GetComponent<Point>().aroundP1, 0] = pControl.points[i - 1];
-                    //pControl.points[i].GetComponent<Point>().aroundP0, 1] = pControl.points[i - columnAmount];
-                    //pControl.points[i].GetComponent<Point>().aroundP2, 1] = pControl.points[i + columnAmount];
-                }
+                //pControl.points[i].GetComponent<Point>().aroundP1, 2] = pControl.points[i + 1];
+                //pControl.points[i].GetComponent<Point>().aroundP2, 1] = pControl.points[i + columnAmount];
             }
+            //point góc phải hàng đầu
+            else if (i == columnAmount - 1)
+            {
+                if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - 1])
+                    && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + columnAmount]))
+                {
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - 1]);
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + columnAmount]);
+                }
+                //pControl.points[i].GetComponent<Point>().aroundP1, 0] = pControl.points[i - 1];
+                //pControl.points[i].GetComponent<Point>().aroundP2, 1] = pControl.points[i + columnAmount];
+            }
+            //point góc trái hàng cuối
+            else if (i == pControl.points.Count - columnAmount)
+            {
+                if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + 1])
+                    && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - columnAmount]))
+                {
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + 1]);
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - columnAmount]);
+                }
+                //pControl.points[i].GetComponent<Point>().aroundP1, 2] = pControl.points[i + 1];
+                //pControl.points[i].GetComponent<Point>().aroundP0, 1] = pControl.points[i - columnAmount];
+            }
+            //ponint góc phải hàng cuối
+            else if (i == pControl.points.Count - 1)
+            {
+                if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - 1])
+                    && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - columnAmount]))
+                {
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - 1]);
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - columnAmount]);
+                }
+                //pControl.points[i].GetComponent<Point>().aroundP1, 0] = pControl.points[i - 1];
+                //pControl.points[i].GetComponent<Point>().aroundP0, 1] = pControl.points[i - columnAmount];
+            }
+            //các points hàng đầu tiên (trừ 2 point đầu mút)
+            else if (Enumerable.Range(1, columnAmount - 1 - 1).Contains(i))
+            {
+                if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - 1])
+                    && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + 1])
+                    && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + columnAmount]))
+                {
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - 1]);
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + 1]);
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + columnAmount]);
+                }
+                //pControl.points[i].GetComponent<Point>().aroundP1, 0] = pControl.points[i - 1];
+                //pControl.points[i].GetComponent<Point>().aroundP1, 2] = pControl.points[i + 1];
+                //pControl.points[i].GetComponent<Point>().aroundP2, 1] = pControl.points[i + columnAmount];
+            }
+            //các point hàng cuối cùng (trừ 2 point đầu mút)
+            else if (Enumerable.Range(pControl.points.Count - columnAmount + 1, pControl.points.Count - 1 - 1).Contains(i))
+            {
+                if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - 1])
+                    && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + 1])
+                    && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - columnAmount]))
+                {
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - 1]);
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + 1]);
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - columnAmount]);
+                }
+                //pControl.points[i].GetComponent<Point>().aroundP1, 0] = pControl.points[i - 1];
+                //pControl.points[i].GetComponent<Point>().aroundP1, 2] = pControl.points[i + 1];
+                //pControl.points[i].GetComponent<Point>().aroundP0, 1] = pControl.points[i - columnAmount];
+            }
+            //các point cột đầu (trừ 2 point đầu mút)
+            else if (i != 0 && i % columnAmount == 0)
+            {
+                if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + 1])
+                    && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - columnAmount])
+                    && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + columnAmount]))
+                {
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + 1]);
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - columnAmount]);
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + columnAmount]);
+                }
+                //pControl.points[i].GetComponent<Point>().aroundP1, 2] = pControl.points[i + 1];
+                //pControl.points[i].GetComponent<Point>().aroundP0, 1] = pControl.points[i - columnAmount];
+                //pControl.points[i].GetComponent<Point>().aroundP2, 1] = pControl.points[i + columnAmount];
+            }
+            //các point cột cuối (trừ 2 point đàu mút)
+            else if (i != (columnAmount - 1) && i != pControl.points.Count - 1 && i % columnAmount == (columnAmount - 1))
+            {
+                if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - 1])
+                   && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - columnAmount])
+                   && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + columnAmount]))
+                {
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - 1]);
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - columnAmount]);
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + columnAmount]);
+                }
+                //pControl.points[i].GetComponent<Point>().aroundP1, 0] = pControl.points[i - 1];
+                //pControl.points[i].GetComponent<Point>().aroundP0, 1] = pControl.points[i - columnAmount];
+                //pControl.points[i].GetComponent<Point>().aroundP2, 1] = pControl.points[i + columnAmount];
+            }
+            //các point nằm giữa
+            else
+            {
+                if (!pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - 1])
+                   && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + 1])
+                   && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i - columnAmount])
+                   && !pControl.points[i].GetComponent<Point>().aroundPoints.Contains(pControl.points[i + columnAmount]))
+                {
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - 1]);
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + 1]);
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i - columnAmount]);
+                    pControl.points[i].GetComponent<Point>().aroundPoints.Add(pControl.points[i + columnAmount]);
+                }
+                //pControl.points[i].GetComponent<Point>().aroundP1, 2] = pControl.points[i + 1];
+                //pControl.points[i].GetComponent<Point>().aroundP1, 0] = pControl.points[i - 1];
+                //pControl.points[i].GetComponent<Point>().aroundP0, 1] = pControl.points[i - columnAmount];
+                //pControl.points[i].GetComponent<Point>().aroundP2, 1] = pControl.points[i + columnAmount];
+            }
+            //}
         }
     }
 }

@@ -3,6 +3,8 @@ using UnityEngine;
 using System;
 using System.Collections;
 using UnityEngine.UI;
+using System.Linq;
+using UnityEngine.EventSystems;
 
 public class Point : MonoBehaviour
 {
@@ -54,7 +56,6 @@ public class Point : MonoBehaviour
     private void Start()
     {
         startSpread = false;
-
         InvokeRepeating("AutoGetMoney", 2f, pInfo.tgPro);
         SpawnCircle();
         pControl = FindObjectOfType<PointsController>();
@@ -62,7 +63,10 @@ public class Point : MonoBehaviour
 
     private void Update()
     {
-        CheckSpreading();
+        if (startSpread && !pChecked)
+        {
+            CheckSpreading();
+        }
     }
 
     /// <summary>
@@ -71,6 +75,7 @@ public class Point : MonoBehaviour
     private void AutoGetMoney()
     {
         GameManager.instance.money += pInfo.proPro;
+        GameManager.instance.moneyText.text = "$: " + GameManager.instance.money.ToString();
     }
 
     /// <summary>
@@ -83,20 +88,19 @@ public class Point : MonoBehaviour
             GameObject temp = Instantiate(circle, this.transform);
             temp.name = "circle" + i;
             temp.GetComponent<Image>().color = new Color32(83, 127, 224, 0);
+            temp.GetComponent<Image>().raycastTarget = false;
             cirlces.Add(temp);
         }
     }
 
     private void CheckSpreading()
     {
-        if (startSpread && !pChecked)
+        Spreading();
+        if (pControl.points.Count(p => p.GetComponent<Point>().block == false) > 1)
         {
-            Spreading();
-            if (pControl.activePoints.Count > 1)
-            {
-                GameManager.instance.ComboMoney(this.gameObject);
-                GameManager.instance.ComboAllPoint(this.gameObject);
-            }
+            GameManager.instance.ComboMoney(this.gameObject);
+            GameManager.instance.ComboAllPoint(this.gameObject);
+            GameManager.instance.moneyText.text = "$: " + GameManager.instance.money.ToString();
         }
     }
 
@@ -107,10 +111,13 @@ public class Point : MonoBehaviour
     {
         if (!block && !pChecked)
         {
+            Debug.Log(this.name + " is pressed!!!");
             for (int i = 0; i < aroundPoints.Count; i++)
             {
                 if (aroundPoints[i].GetComponent<Point>().block == false
-                    && aroundPoints[i].GetComponent<Point>().pChecked == false)
+                    //&& aroundPoints[i].GetComponent<Point>().startSpread == false
+                    && aroundPoints[i].GetComponent<Point>().pChecked == false
+                    && aroundPoints[i].GetComponent<Image>().color != Color.black)
                 {
                     StartCoroutine(FillFullLine(this.gameObject, aroundPoints[i], cirlces[i]));
                 }
@@ -136,13 +143,18 @@ public class Point : MonoBehaviour
             circle.transform.position = Vector3.Lerp(startPos.transform.position, endPos.transform.position, time);
             yield return null;
         }
+        endPos.GetComponent<Image>().color = Color.black;
         endPos.GetComponent<Point>().startSpread = true;
+        endPos.GetComponent<Point>().canCollect = false;
         endPos.GetComponent<Point>().spreadIndex = spreadIndex + 1;
-        foreach (var c in endPos.GetComponentsInChildren<CircleProperties>())
-        {
-            c.circleValue = endPos.GetComponent<Point>().spreadIndex;
-        }
+        //foreach (var c in endPos.GetComponentsInChildren<CircleProperties>())
+        //{
+        //    c.circleValue = endPos.GetComponent<Point>().spreadIndex;
+        //}
         circle.GetComponent<Image>().color = new Color32(83, 127, 224, 0);
+        yield return new WaitForSeconds(endPos.GetComponent<Point>().pInfo.tgClick);
+        endPos.GetComponent<Point>().canCollect = true;
+        endPos.GetComponent<Image>().color = Color.white;
     }
 }
 
